@@ -7,3 +7,5 @@ V
 &tests/vacuum-energy-device-nft.test.ts,2/8/28a4b4f85ae65bec98ecc4a14448926c95ba3567
 X
 (contracts/vacuum-energy-marketplace.clar,5/3/539042db3955ac1b633eaad1155e2cf503f2b2f9
+W
+'tests/vacuum-energy-marketplace.test.ts,4/6/46606269c7ed541d2d662bf5f86e1d5dfdd15bb0
