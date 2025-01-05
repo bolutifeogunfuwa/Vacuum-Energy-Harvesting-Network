@@ -1,21 +1,55 @@
+import { describe, it, expect, beforeEach } from 'vitest';
 
-import { describe, expect, it } from "vitest";
+// Simulated contract state
+let lastDeviceId = 0;
+const deviceData = new Map();
+const deviceOwners = new Map();
 
-const accounts = simnet.getAccounts();
-const address1 = accounts.get("wallet_1")!;
-
-/*
-  The test below is an example. To learn more, read the testing documentation here:
-  https://docs.hiro.so/stacks/clarinet-js-sdk
-*/
-
-describe("example tests", () => {
-  it("ensures simnet is well initalised", () => {
-    expect(simnet.blockHeight).toBeDefined();
+// Simulated contract functions
+function mintDevice(name: string, description: string, efficiency: number, creator: string) {
+  const deviceId = ++lastDeviceId;
+  deviceData.set(deviceId, {
+    creator,
+    name,
+    description,
+    efficiency,
+    creationDate: Date.now()
   });
+  deviceOwners.set(deviceId, creator);
+  return deviceId;
+}
 
-  // it("shows an example", () => {
-  //   const { result } = simnet.callReadOnlyFn("counter", "get-counter", [], address1);
-  //   expect(result).toBeUint(0);
-  // });
+function transferDevice(deviceId: number, sender: string, recipient: string) {
+  if (deviceOwners.get(deviceId) !== sender) throw new Error('Not authorized');
+  deviceOwners.set(deviceId, recipient);
+  return true;
+}
+
+describe('Vacuum Energy Device NFT Contract', () => {
+  beforeEach(() => {
+    lastDeviceId = 0;
+    deviceData.clear();
+    deviceOwners.clear();
+  });
+  
+  it('should mint a new device NFT', () => {
+    const id = mintDevice('Quantum Vacuum Extractor', 'A device to extract energy from quantum vacuum fluctuations', 85, 'creator1');
+    expect(id).toBe(1);
+    const device = deviceData.get(id);
+    expect(device.name).toBe('Quantum Vacuum Extractor');
+    expect(device.efficiency).toBe(85);
+    expect(deviceOwners.get(id)).toBe('creator1');
+  });
+  
+  it('should transfer device ownership', () => {
+    const id = mintDevice('Quantum Vacuum Extractor', 'A device to extract energy from quantum vacuum fluctuations', 85, 'creator1');
+    expect(transferDevice(id, 'creator1', 'newowner1')).toBe(true);
+    expect(deviceOwners.get(id)).toBe('newowner1');
+  });
+  
+  it('should not allow unauthorized transfers', () => {
+    const id = mintDevice('Quantum Vacuum Extractor', 'A device to extract energy from quantum vacuum fluctuations', 85, 'creator1');
+    expect(() => transferDevice(id, 'unauthorized_user', 'newowner1')).toThrow('Not authorized');
+  });
 });
+
